@@ -10,9 +10,9 @@ gem "compass", ">= 0.10.1"
 
 gem 'rspec', '>=2.0.0.alpha.11', :group => :test
 gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
-gem 'remarkable', '>=4.0.0.alpha4', :group => :test
-gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
-gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
+#gem 'remarkable', '>=4.0.0.alpha4', :group => :test
+#gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
+#gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
 gem "factory_girl_rails" # BUG => , :group => :test
 
 gem 'cucumber', ">=0.6.3", :group => :cucumber
@@ -22,7 +22,7 @@ gem 'database_cleaner', ">=0.5.0", :group => :cucumber
 gem 'spork', ">=0.8.4", :group => :cucumber
 gem "pickle", :git => "git://github.com/codegram/pickle.git", :group => :cucumber
 
-gem 'inploy'
+#gem 'inploy'
 
 gem 'rails3-generators', :git => "git://github.com/indirect/rails3-generators.git"
 
@@ -45,11 +45,10 @@ run "compass init --using blueprint --app rails"
 
 run "rm public/stylesheets/*"
 
-get "http://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
-get "http://github.com/dcrec1/rails3_template/raw/master/gitignore" ,".gitignore" 
-get "http://github.com/dcrec1/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
-get "http://github.com/dcrec1/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
-get "http://github.com/dcrec1/rails3_template/raw/master/factory_girl.rb", "features/support/factory_girl.rb"
+get "http://github.com/enspiral/rails3_template/raw/master/gitignore" ,".gitignore" 
+get "http://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
+get "http://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
+get "http://github.com/enspiral/rails3_template/raw/master/factory_girl.rb", "features/support/factory_girl.rb"
 
 create_file 'config/deploy.rb', <<-DEPLOY
 application = '#{app_name}'

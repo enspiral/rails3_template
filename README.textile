@@ -1,1 +1,2 @@
-<pre><code>rails new app_name -m http://github.com/dcrec1/rails3_template/raw/master/main.rb</code></pre>
+<h3>Rails 3 the way we like it</h3>
+<pre><code>rails new app_name -m http://github.com/enspiral/rails3_template/raw/master/main.rb</code></pre>

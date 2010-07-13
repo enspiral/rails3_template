@@ -51,9 +51,35 @@ get "http://github.com/enspiral/rails3_template/raw/master/application.html.haml
 get "http://github.com/enspiral/rails3_template/raw/master/factory_girl.rb", "features/support/factory_girl.rb"
 
 create_file 'config/deploy.rb', <<-DEPLOY
-application = '#{app_name}'
+application = '
 repository = ''
 hosts = %w() 
+set :application, "#{app_name}'"
+set :user, application
+set :repository,  "git@github.com:enspiral/"#{app_name}'.git"
+set :scm, :git
+
+set :deploy_to, "/home/\#{application}/production"
+set :deploy_via, :remote_cache
+set :use_sudo, false
+
+role :web, "173.230.155.132"                 
+role :app, "173.230.155.132"                  
+role :db,  "173.230.155.132", :primary => true 
+
+namespace :deploy do
+  [:stop, :start, :restart].each do |task_name|
+    task task_name, :roles => [:app] do
+      run "cd \#{current_path} && touch tmp/restart.txt"
+    end 
+  end 
+  task :symlink_configs do
+    run %( cd \#{release_path} &&
+      ln -nfs \#{shared_path}/config/database.yml \#{release_path}/config/database.yml
+    )
+  end 
+end
+before "deploy:restart", "deploy:symlink_configs"
 DEPLOY
 
 git :init

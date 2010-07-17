@@ -13,7 +13,6 @@ gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
 #gem 'remarkable', '>=4.0.0.alpha4', :group => :test
 #gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
 #gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
-gem "factory_girl_rails" # BUG => , :group => :test
 
 gem 'cucumber', ">=0.6.3", :group => :cucumber
 gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
@@ -30,7 +29,6 @@ application  <<-GENERATORS
 config.generators do |g|
   g.template_engine :haml
   g.test_framework  :rspec, :fixture => true, :views => false
-  g.fixture_replacement :factory_girl, :dir => "spec/support/factories"
 end
 GENERATORS
 
@@ -40,15 +38,17 @@ generate "cucumber:install --capybara --rspec --spork"
 generate "pickle:skeleton --path --email"
 generate "friendly_id"
 generate "formtastic:install"
+generate "devise:install"
+
 run "gem install compass"
 run "compass init --using blueprint --app rails"
 
 run "rm public/stylesheets/*"
 
+#TODO setup blueprints file
 get "http://github.com/enspiral/rails3_template/raw/master/gitignore" ,".gitignore" 
 get "http://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
 get "http://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
-get "http://github.com/enspiral/rails3_template/raw/master/factory_girl.rb", "features/support/factory_girl.rb"
 
 create_file 'config/deploy.rb', <<-DEPLOY
 application = '

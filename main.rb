@@ -4,7 +4,7 @@ gem 'haml', '>=3.0.4'
 gem 'inherited_resources', '>=1.1.2'
 gem 'will_paginate', '>=3.0.pre'
 gem 'devise', '>=1.1.rc2'
-gem "formtastic", :git => "git://github.com/justinfrench/formtastic.git", :branch => "rails3"
+gem "formtastic",'>= 1.1.0'
 gem 'friendly_id', '~>3.0'
 gem "compass", ">= 0.10.1"
 

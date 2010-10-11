@@ -7,6 +7,9 @@ gem 'devise', '>=1.1.rc2'
 gem "formtastic",'>= 1.1.0'
 gem 'friendly_id', '~>3.0'
 gem "compass", ">= 0.10.1"
+gem 'hoptoad_notifier'
+
+gem 'capistrano', :group => :development
 
 gem 'rspec', '>=2.0.0.alpha.11', :group => :test
 gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
@@ -51,17 +54,15 @@ get "http://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/st
 get "http://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
 
 create_file 'config/deploy.rb', <<-DEPLOY
-application = '
-repository = ''
-hosts = %w() 
-set :application, "#{app_name}'"
+set :application, "#{app_name}"
 set :user, application
-set :repository,  "git@github.com:enspiral/"#{app_name}'.git"
+set :repository,  "git@github.com:enspiral/"#{app_name}.git"
 set :scm, :git
 
-set :deploy_to, "/home/\#{application}/production"
+set :deploy_to, "/home/\#{application}/staging"
 set :deploy_via, :remote_cache
 set :use_sudo, false
+set :rails_env, :staging
 
 role :web, "173.230.155.132"                 
 role :app, "173.230.155.132"                  
@@ -78,10 +79,19 @@ namespace :deploy do
       ln -nfs \#{shared_path}/config/database.yml \#{release_path}/config/database.yml
     )
   end 
+  desc "bundle gems"
+  task :bundle do
+    run "cd #{release_path} && RAILS_ENV=#{rails_env} && bundle install #{shared_path}/gems/cache --deployment"
+  end 
 end
-before "deploy:restart", "deploy:symlink_configs"
+
+after "deploy:update_code" do
+deploy.symlink_configs                                                                                                                     
+  deploy.bundle                                                                                                                              
+end
 DEPLOY
 
+run "capify ."
 git :init
 git :add => '.'
 git :commit => '-am "Initial commit"'

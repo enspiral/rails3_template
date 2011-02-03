@@ -13,15 +13,13 @@ gem 'capistrano', :group => :development
 
 gem 'rspec', '>=2.0.0.alpha.11', :group => :test
 gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
-#gem 'remarkable', '>=4.0.0.alpha4', :group => :test
-#gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
-#gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
+
 
 gem 'steak' , :group => :test
 #gem 'cucumber', ">=0.6.3", :group => :cucumber
 #gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
 gem 'capybara', ">=0.3.6", :group => :test
-#gem 'database_cleaner', ">=0.5.0", :group => :test
+gem 'database_cleaner', ">=0.5.0", :group => :test
 #gem 'spork', ">=0.8.4", :group => :test
 #gem "pickle", :group => :test
 
@@ -58,7 +56,7 @@ create_file 'config/deploy.rb', <<-DEPLOY
 require "bundler/capistrano"
 
 set :application, "#{app_name}"
-set :user, application
+:set :user, application
 set :repository,  "git@github.com:enspiral/"#{app_name}.git"
 set :scm, :git
 

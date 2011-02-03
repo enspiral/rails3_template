@@ -17,12 +17,13 @@ gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
 #gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
 #gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
 
-gem 'cucumber', ">=0.6.3", :group => :cucumber
-gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
-gem 'capybara', ">=0.3.6", :group => :cucumber
-gem 'database_cleaner', ">=0.5.0", :group => :cucumber
-gem 'spork', ">=0.8.4", :group => :cucumber
-gem "pickle", :group => :cucumber
+gem 'steak' , :group => :test
+#gem 'cucumber', ">=0.6.3", :group => :cucumber
+#gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
+gem 'capybara', ">=0.3.6", :group => :test
+#gem 'database_cleaner', ">=0.5.0", :group => :test
+#gem 'spork', ">=0.8.4", :group => :test
+#gem "pickle", :group => :test
 
 #gem 'inploy'
 
@@ -37,8 +38,8 @@ GENERATORS
 
 run "bundle install"
 generate "rspec:install"
-generate "cucumber:install --capybara --rspec --spork"
-generate "pickle:skeleton --path --email"
+#generate "cucumber:install --capybara --rspec --spork"
+#generate "pickle:skeleton --path --email"
 generate "friendly_id"
 generate "formtastic:install"
 generate "devise:install"
@@ -49,11 +50,13 @@ run "compass init --using blueprint --app rails"
 run "rm public/stylesheets/*"
 
 #TODO setup blueprints file
-get "http://github.com/enspiral/rails3_template/raw/master/gitignore" ,".gitignore" 
-get "http://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
-get "http://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
+get "https://github.com/enspiral/rails3_template/raw/master/gitignore" ,".gitignore"
+get "https://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
+get "https://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
 
 create_file 'config/deploy.rb', <<-DEPLOY
+require "bundler/capistrano"
+
 set :application, "#{app_name}"
 set :user, application
 set :repository,  "git@github.com:enspiral/"#{app_name}.git"
@@ -81,7 +84,7 @@ namespace :deploy do
   end 
   desc "bundle gems"
   task :bundle do
-    run "cd #{release_path} && RAILS_ENV=#{rails_env} && bundle install #{shared_path}/gems/cache --deployment"
+    run "cd #{release_path} && RAILS_ENV=#{rails_env} && run  bundle install --gemfile #{release_path}/Gemfile --path  #{shared_path}/bundle --deployment  --without development test"
   end 
 end
 

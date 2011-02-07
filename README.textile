@@ -1,2 +1,7 @@
 <h3>Rails 3 the way we like it</h3>
-<pre><code>rails new app_name -m http://github.com/enspiral/rails3_template/raw/master/main.rb</code></pre>
+<pre>
+
+Currently rails3 balks at trying to run templates from a https url. You are going to have to fetch it via wget and run it locally.
+Or you can clone the whole repo, it might be faster that way.
+
+<code>rails new app_name -m http://github.com/enspiral/rails3_template/raw/master/main.rb</code></pre>

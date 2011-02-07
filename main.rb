@@ -1,100 +1,105 @@
-run "rm -Rf README public/index.html public/javascripts/* test app/views/layouts/*"
+@remote_template_path = "https://github.com/enspiral/rails3_template/raw/master"
 
-gem 'haml', '>=3.0.4'
-gem 'inherited_resources', '>=1.1.2'
-gem 'will_paginate', '>=3.0.pre'
-gem 'devise', '>=1.1.rc2'
-gem "formtastic",'>= 1.1.0'
-gem 'friendly_id', '~>3.0'
-gem "compass", ">= 0.10.1"
-gem 'hoptoad_notifier'
+@local_template_path = File.expand_path(File.join(File.dirname(__FILE__)))
 
-gem 'capistrano', :group => :development
-
-gem 'rspec', '>=2.0.0.alpha.11', :group => :test
-gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
+@template_path = @local_template_path
+puts @local_template_path
 
 
-gem 'steak' , :group => :test
-#gem 'cucumber', ">=0.6.3", :group => :cucumber
-#gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
-gem 'capybara', ">=0.3.6", :group => :test
-gem 'database_cleaner', ">=0.5.0", :group => :test
-#gem 'spork', ">=0.8.4", :group => :test
-#gem "pickle", :group => :test
 
-#gem 'inploy'
-
-#gem 'rails3-generators', :git => "git://github.com/indirect/rails3-generators.git"
-
-application  <<-GENERATORS 
-config.generators do |g|
-  g.template_engine :haml
-  g.test_framework  :rspec, :fixture => true, :views => false
+initializer 'generators.rb', <<-RUBY
+Rails.application.config.generators do |g|
 end
-GENERATORS
+RUBY
 
-run "bundle install"
-generate "rspec:install"
-#generate "cucumber:install --capybara --rspec --spork"
-#generate "pickle:skeleton --path --email"
-generate "friendly_id"
-generate "formtastic:install"
-generate "devise:install"
 
-run "gem install compass"
-run "compass init --using blueprint --app rails"
 
-run "rm public/stylesheets/*"
 
+def apply_template(name)
+
+  local_file_name = "#{@local_template_path}/templates/#{name}.rb"
+
+
+  # This is a temporary hack to only use local paths since remote paths are currently broken in rails3.
+  # apply local_file_name
+  # return
+
+   if File.exist?(local_file_name)
+     apply local_file_name
+   else
+     apply "#{remote_template_path}/templates/#{name}rb"
+   end
+end
+
+def agnostic_copy(from_file, to_file)
+
+  if @template_path[0..6] == "http://" || @template_path[0..7] == "https://"
+    run "curl -L #{@template_path}/#{from_file} > #{to_file}"
+  else
+    copy_file "#{@template_path}/#{from_file}", "#{to_file}"
+  end
+end
+
+@after_blocks = []
+def after_bundler(&block); @after_blocks << block; end
+
+
+
+initializer 'generators.rb', <<-RUBY
+Rails.application.config.generators do |g|
+end
+RUBY
+
+
+#----------------------------------------------------------------------------
+# Remove the usual cruft
+#----------------------------------------------------------------------------
+puts "removing unneeded files..."
+
+#run 'rm config/database.yml' #too destructive??
+run 'rm public/index.html'
+run 'rm public/favicon.ico'
+run 'rm public/images/rails.png'
+run 'rm README'
+run 'touch README'
+
+puts "banning spiders from your site by changing robots.txt..."
+gsub_file 'public/robots.txt', /# User-Agent/, 'User-Agent'
+gsub_file 'public/robots.txt', /# Disallow/, 'Disallow'
+
+
+
+#----------------------------------------------------------------------------
+# Set up the gemfile and install all gems needed for the rest of the templates
+#----------------------------------------------------------------------------
+apply_template "standard_gems"
+apply_template "haml"
+apply_template "rspec"
+apply_template 'jquery'
+apply_template 'steak'
+apply_template 'deploy'
+apply_template 'compass'
+apply_template 'devise'
+apply_template 'omniauth'
+
+
+puts "running bundle install, this might take a little bit"
+run 'bundle install'
+puts "Running after Bundler callbacks."
+@after_blocks.each{|b| b.call}
+
+puts "placing files from the repo into your app"
 #TODO setup blueprints file
-get "https://github.com/enspiral/rails3_template/raw/master/gitignore" ,".gitignore"
+get "https://github.com/enspiral/rails3_template/raw/master/gitignore", ".gitignore"
 get "https://github.com/enspiral/rails3_template/raw/master/screen.scss", "app/stylesheets/screen.scss"
 get "https://github.com/enspiral/rails3_template/raw/master/application.html.haml", "app/views/layouts/application.html.haml"
 
-create_file 'config/deploy.rb', <<-DEPLOY
-require "bundler/capistrano"
-
-set :application, "#{app_name}"
-:set :user, application
-set :repository,  "git@github.com:enspiral/"#{app_name}.git"
-set :scm, :git
-
-set :deploy_to, "/home/\#{application}/staging"
-set :deploy_via, :remote_cache
-set :use_sudo, false
-set :rails_env, :staging
-
-role :web, "173.230.155.132"                 
-role :app, "173.230.155.132"                  
-role :db,  "173.230.155.132", :primary => true 
-
-namespace :deploy do
-  [:stop, :start, :restart].each do |task_name|
-    task task_name, :roles => [:app] do
-      run "cd \#{current_path} && touch tmp/restart.txt"
-    end 
-  end 
-  task :symlink_configs do
-    run %( cd \#{release_path} &&
-      ln -nfs \#{shared_path}/config/database.yml \#{release_path}/config/database.yml
-    )
-  end 
-  desc "bundle gems"
-  task :bundle do
-    run "cd #{release_path} && RAILS_ENV=#{rails_env} && run  bundle install --gemfile #{release_path}/Gemfile --path  #{shared_path}/bundle --deployment  --without development test"
-  end 
-end
-
-after "deploy:update_code" do
-deploy.symlink_configs                                                                                                                     
-  deploy.bundle                                                                                                                              
-end
-DEPLOY
-
+puts "capify"
 run "capify ."
+
+puts "git"
 git :init
 git :add => '.'
 git :commit => '-am "Initial commit"'
- 
+
 puts "SUCCESS!"

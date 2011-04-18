@@ -1,6 +1,7 @@
 run "rm -Rf README public/index.html public/javascripts/* test app/views/layouts/*"
 
-gem 'haml', '>=3.0.4'
+#gem 'haml', '>=3.0.4'
+gem "haml-rails", ">= 0.2"
 gem 'inherited_resources', '>=1.1.2'
 gem 'will_paginate', '>=3.0.pre'
 gem 'devise', '>=1.1.rc2'
@@ -9,27 +10,27 @@ gem 'friendly_id', '~>3.0'
 gem "compass", ">= 0.10.1"
 gem 'hoptoad_notifier'
 
-gem 'capistrano', :group => :development
+group :development do
+  gem 'nifty-generators'
+  gem 'capistrano'
+  gem 'hpricot'
+end
 
-gem 'rspec', '>=2.0.0.alpha.11', :group => :test
-gem 'rspec-rails', '>=2.0.0.alpha.11', :group => :test
-#gem 'remarkable', '>=4.0.0.alpha4', :group => :test
-#gem 'remarkable_activemodel', '>=4.0.0.alpha4', :group => :test
-#gem 'remarkable_activerecord', '>=4.0.0.alpha4', :group => :test
-
-gem 'cucumber', ">=0.6.3", :group => :cucumber
-gem 'cucumber-rails', ">=0.3.2", :group => :cucumber
-gem 'capybara', ">=0.3.6", :group => :cucumber
-gem 'database_cleaner', ">=0.5.0", :group => :cucumber
-gem 'spork', ">=0.8.4", :group => :cucumber
-gem "pickle", :group => :cucumber
-
-#gem 'inploy'
-
-#gem 'rails3-generators', :git => "git://github.com/indirect/rails3-generators.git"
+group :test do
+  gem 'rspec', '>=2.0.0.alpha.11'
+  gem 'rspec-rails', '>=2.0.0.alpha.11'
+  gem 'steak', '>= 1.0.1'
+  gem "capybara", "~> 0.3.8"
+  gem 'machinist', '>= 2.0.0.beta2'
+  gem "faker"                                                                                                                                                
+  gem "accept_values_for"
+  gem 'timecop'
+end
 
 application  <<-GENERATORS 
 config.generators do |g|
+  g.fixture_replacement :machinist
+  g.orm :active_record
   g.template_engine :haml
   g.test_framework  :rspec, :fixture => true, :views => false
 end
@@ -37,10 +38,9 @@ GENERATORS
 
 run "bundle install"
 generate "rspec:install"
-generate "cucumber:install --capybara --rspec --spork"
-generate "pickle:skeleton --path --email"
 generate "friendly_id"
 generate "formtastic:install"
+generate "machinist:install"
 generate "devise:install"
 
 run "gem install compass"
